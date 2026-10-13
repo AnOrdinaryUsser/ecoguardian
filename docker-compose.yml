@@ -1,0 +1,26 @@
+# Base de datos para desarrollo local (el resto de servicios se arrancan con
+# start-lan.ps1). Aplica automaticamente database/schema/*.sql la primera vez.
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: ecoguardian_postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ecoguardian}
+      POSTGRES_USER: ${POSTGRES_USER:-ecoguardian}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me}
+    ports:
+      # Solo en este equipo: la BD no debe verse desde la red local.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - ecoguardian_postgis_data:/var/lib/postgresql/data
+      - ./database/schema:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecoguardian}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  ecoguardian_postgis_data:

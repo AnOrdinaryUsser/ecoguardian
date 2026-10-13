@@ -1,0 +1,44 @@
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.env
+backend/.env
+model-service/.env
+frontend/.env
+model-service/weights/*
+!model-service/weights/.gitkeep
+model-service/tiles_output/*
+!model-service/tiles_output/.gitkeep
+etl/data/*
+!etl/data/.gitkeep
+.backups/
+
+# --- Datos y artefactos que no deben subirse ---
+backend/uploads/
+uploads/
+*.log
+.DS_Store
+Thumbs.db
+*.tar
+*.tar.gz
+*.zip
+.sync.tar
+
+# Copia del proyecto anterior (datos de la Junta de Castilla y Leon): no se publica
+_legacy_centinela_jcyl/
+
+# Script de un solo uso para actualizar el despliegue (ya aplicado)
+apply_deploy.py
+
+# Servidor / IDE
+.vscode/
+.idea/
+docs/node_modules/
+docs/build/
+docs/.docusaurus/
+
+# Imagenes de prueba de satelite (Mapbox): no redistribuir
+model-service/prueba.png
+model-service/prueba.jpg

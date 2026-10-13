@@ -1,0 +1,55 @@
+# Caddy de produccion. Corre DENTRO del contenedor "frontend" (ver
+# frontend/Dockerfile): sirve la web compilada y reenvia /api al backend por
+# la red interna de Docker, asi el navegador solo habla con UN origen.
+# model-service no tiene bloque ni puerto publicado: solo lo ve el backend.
+#
+# Dos formas de entrar, misma aplicacion:
+#
+#  1) Por dominio  ->  {$DOMAIN}   (p. ej. ecoguardian.es, www.ecoguardian.es)
+#     Caddy pide y renueva SOLO el certificado Let's Encrypt (hace falta que el
+#     DNS apunte a este servidor y que los puertos 80 y 443 lleguen a el), y
+#     http://ecoguardian.es/... redirige a https://ecoguardian.es/...
+#
+#  2) Por IP (o cualquier otro nombre) por HTTP en el puerto 80
+#     http://<ip-del-servidor>/incidencias. Las IP no pueden tener certificado
+#     de Let's Encrypt, asi que por IP se sirve en HTTP plano.
+#
+# Cualquier ruta de la SPA (/incidencias, /areas, /rutas...) devuelve index.html
+# para que el router de React la resuelva al recargar o abrir el enlace directo.
+
+(app) {
+	encode gzip
+
+	# Cabeceras de seguridad basicas
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options SAMEORIGIN
+		-Server
+	}
+
+	# IMPORTANTE: Caddy NO ejecuta las directivas en el orden escrito; sin este
+	# bloque "route", try_files reescribiria TAMBIEN /api/* a /index.html antes
+	# de que reverse_proxy lo vea. Con "route" se respeta el orden de abajo.
+	route {
+		@api path /api/* /api-docs /api-docs/* /api-docs.json /health
+		reverse_proxy @api backend:4000
+
+		# Orden obligatorio: primero reescribir a index.html lo que no sea un
+		# fichero real (try_files) y SOLO despues servir (file_server). Al reves,
+		# file_server contesta 404 a /incidencias antes de que try_files actue.
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+# --- Dominio: HTTPS automatico (y http -> https) ---
+{$DOMAIN} {
+	import app
+}
+
+# --- Resto de hosts por HTTP (la IP del servidor) ---
+http:// {
+	import app
+}
