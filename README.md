@@ -15,7 +15,7 @@
 
 > **Origen del proyecto.** EcoGuardian nace de [**Centinela**](https://github.com/AnOrdinaryUsser/centinela), la plataforma que detecta vertederos ilegales sobre imagen de satélite. Parte de esa base y la lleva al ámbito de los **drones**: planificación de rutas de vuelo, análisis del vídeo del vuelo y gestión de las incidencias detectadas, para toda España.
 
-Proyecto PUMIDISD / NT74 (Plan TCUE) · Esalab · Universidad de Salamanca.
+Proyecto NT74 (Plan TCUE) · Esalab · Universidad de Salamanca.
 
 ## Índice
 
